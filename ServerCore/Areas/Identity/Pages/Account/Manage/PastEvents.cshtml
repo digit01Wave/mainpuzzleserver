@@ -1,0 +1,57 @@
+﻿@page
+@model ServerCore.Areas.Identity.Pages.Account.Manage.PastEventsModel
+@{
+    ViewData["Title"] = "Past events you participated in";
+    ViewData["ActivePage"] = ManageNavPages.PastEvents;
+}
+
+<h4>@ViewData["Title"]</h4>
+<table class="table table-condensed">
+    <thead>
+        <tr>
+            <th>
+                Event
+            </th>
+            <th>
+                Team
+            </th>
+            <th>
+                Placement
+            </th>
+            <th>
+                Certificate
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (int i = 0; i < Model.PastEventDetailsList.Count; ++i)
+        {
+            PastEventsModel.PastEventDetails eventDetails = Model.PastEventDetailsList[i];
+            <tr>
+                <td>
+                    @eventDetails.Event.Name
+                </td>
+                <td>
+                    @eventDetails.Team?.Name
+                </td>
+                @if(eventDetails.Status == PastEventsModel.Status.Unknown)
+                {
+                    <td> Unkonwn </td>
+                }
+                else if (eventDetails.Status == PastEventsModel.Status.Disqualified)
+                {
+                    <td> Disqualified </td>
+                }
+                else if (eventDetails.Status == PastEventsModel.Status.InProgress)
+                {
+                    <td> Event still in progress </td>
+                }
+                else if (eventDetails.Status == PastEventsModel.Status.Completed)
+                {
+                    <td> Ranked @eventDetails.LeaderboardPlacement out of @eventDetails.TotalTeamsOnLeaderboard </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+

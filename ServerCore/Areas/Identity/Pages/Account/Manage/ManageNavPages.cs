@@ -10,6 +10,8 @@ namespace ServerCore.Areas.Identity.Pages.Account.Manage
     {
         public static string Index => "Index";
 
+        public static string PastEvents => "PastEvents";
+
         public static string ChangePassword => "ChangePassword";
 
         public static string DownloadPersonalData => "DownloadPersonalData";
@@ -21,6 +23,8 @@ namespace ServerCore.Areas.Identity.Pages.Account.Manage
         public static string PersonalData => "PersonalData";
 
         public static string IndexNavClass(ViewContext viewContext) => PageNavClass(viewContext, Index);
+
+        public static string PastEventsNavClass(ViewContext viewContext) => PageNavClass(viewContext, PastEvents);
 
         public static string DownloadPersonalDataNavClass(ViewContext viewContext) => PageNavClass(viewContext, DownloadPersonalData);
 
