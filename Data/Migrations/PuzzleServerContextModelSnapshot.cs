@@ -370,6 +370,12 @@ namespace Data.Migrations
                     b.Property<double>("LockoutIncorrectGuessPeriod")
                         .HasColumnType("float");
 
+                    b.Property<string>("LunchDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LunchOptions")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("LunchReportDate")
                         .HasColumnType("datetime2");
 
@@ -394,6 +400,9 @@ namespace Data.Migrations
 
                     b.Property<string>("RulesContent")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("ShouldShowHelpMessageOnlyToAuthor")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("ShowFastestSolves")
                         .HasColumnType("bit");
@@ -604,6 +613,71 @@ namespace Data.Migrations
                     b.ToTable("Invitations");
                 });
 
+            modelBuilder.Entity("ServerCore.DataModel.Message", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<int?>("ClaimerID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDateTimeInUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EventID")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsFromGameControl")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("ModifiedDateTimeInUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("PlayerID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PuzzleID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SenderID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Subject")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int?>("TeamID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<string>("ThreadId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("ClaimerID");
+
+                    b.HasIndex("EventID");
+
+                    b.HasIndex("PlayerID");
+
+                    b.HasIndex("PuzzleID");
+
+                    b.HasIndex("SenderID");
+
+                    b.HasIndex("TeamID");
+
+                    b.HasIndex("ThreadId");
+
+                    b.ToTable("Messages");
+                });
+
             modelBuilder.Entity("ServerCore.DataModel.Piece", b =>
                 {
                     b.Property<int>("ID")
@@ -655,13 +729,15 @@ namespace Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LunchModifications")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<int>("PlayerId")
                         .HasColumnType("int");
 
                     b.Property<string>("ShirtSize")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("ID");
 
@@ -704,6 +780,9 @@ namespace Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<string>("CustomAuthorText")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CustomCSSFile")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CustomSolutionURL")
@@ -755,6 +834,9 @@ namespace Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<int>("MaxAnnotationKey")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("MinInGroupCount")
                         .HasColumnType("int");
 
                     b.Property<int>("MinPrerequisiteCount")
@@ -877,10 +959,13 @@ namespace Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("EmployeeAlias")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("IdentityUserId")
                         .IsRequired()
@@ -893,13 +978,17 @@ namespace Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("TShirtSize")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<bool>("VisibleToOthers")
                         .HasColumnType("bit");
@@ -932,7 +1021,8 @@ namespace Data.Migrations
 
                     b.Property<string>("SubmittedText")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.HasKey("ID");
 
@@ -1069,7 +1159,8 @@ namespace Data.Migrations
 
                     b.Property<string>("SubmissionText")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<int>("SubmitterID")
                         .HasColumnType("int");
@@ -1135,7 +1226,8 @@ namespace Data.Migrations
 
                     b.Property<string>("SubmissionText")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<int>("SubmitterID")
                         .HasColumnType("int");
@@ -1175,11 +1267,19 @@ namespace Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
+                    b.Property<bool>("AutoApproveTeammates")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("AutoTeamType")
+                        .HasColumnType("int");
+
                     b.Property<string>("Bio")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("CustomRoom")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int>("EventID")
                         .HasColumnType("int");
@@ -1201,19 +1301,24 @@ namespace Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Password")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PrimaryContactEmail")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("PrimaryPhoneNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("SecondaryPhoneNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<bool>("ShowTeamAnnouncement")
                         .HasColumnType("bit");
@@ -1260,7 +1365,8 @@ namespace Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LunchModifications")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<int>("TeamId")
                         .HasColumnType("int");
@@ -1476,6 +1582,53 @@ namespace Data.Migrations
                     b.HasOne("ServerCore.DataModel.Team", null)
                         .WithMany("Invitations")
                         .HasForeignKey("TeamID");
+                });
+
+            modelBuilder.Entity("ServerCore.DataModel.Message", b =>
+                {
+                    b.HasOne("ServerCore.DataModel.PuzzleUser", "Claimer")
+                        .WithMany()
+                        .HasForeignKey("ClaimerID")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("ServerCore.DataModel.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ServerCore.DataModel.PuzzleUser", "Player")
+                        .WithMany()
+                        .HasForeignKey("PlayerID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("ServerCore.DataModel.Puzzle", "Puzzle")
+                        .WithMany()
+                        .HasForeignKey("PuzzleID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("ServerCore.DataModel.PuzzleUser", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ServerCore.DataModel.Team", "Team")
+                        .WithMany()
+                        .HasForeignKey("TeamID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Claimer");
+
+                    b.Navigation("Event");
+
+                    b.Navigation("Player");
+
+                    b.Navigation("Puzzle");
+
+                    b.Navigation("Sender");
+
+                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("ServerCore.DataModel.Piece", b =>

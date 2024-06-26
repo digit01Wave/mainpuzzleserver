@@ -20,10 +20,10 @@
             <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th>
+                        <th style="width:50%;">
                             Basic
                         </th>
-                        <th>
+                        <th style="width:50%;">
                             Advanced
                         </th>
                     </tr>
@@ -99,6 +99,11 @@
                                 <span asp-validation-for="Puzzle.MinPrerequisiteCount" class="text-danger"></span>
                             </div>
                             <div class="form-group">
+                                <label asp-for="Puzzle.MinInGroupCount" class="control-label"></label>
+                                <input asp-for="Puzzle.MinInGroupCount" class="form-control" />
+                                <span asp-validation-for="Puzzle.MinInGroupCount" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
                                 <label asp-for="Puzzle.SupportEmailAlias" class="control-label"></label>
                                 <input asp-for="Puzzle.SupportEmailAlias" class="form-control" />
                                 <span asp-validation-for="Puzzle.SupportEmailAlias" class="text-danger"></span>
@@ -107,6 +112,23 @@
                                 <label asp-for="Puzzle.CustomAuthorText" class="control-label"></label>
                                 <input asp-for="Puzzle.CustomAuthorText" class="form-control" />
                                 <span asp-validation-for="Puzzle.CustomAuthorText" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Puzzle.CustomCSSFile" class="control-label"></label>
+                                <div class="text-danger" style="font-size: 10px">The name of a CSS file to customize the appearance of the Submission 
+                                    page when embedding is enabled. If only a filepath is provided (i.e. not a full url beginning with http...), the 
+                                    relative path of the file will start in the shared resources folder. The path on local development environments 
+                                    may differ, but in production, the shared resources folder (and any subfolder uploaded to it as a zip file) is at 
+                                    https://puzzleserverteststore.blob.core.windows.net/evt{eventId}/resources/{optionalFolderName}/{filename}
+                                    <br /><br />
+                                    A full url will be used as-is.  Please note that in development, non-raw full urls to files uploaded to a specific
+                                    puzzle will fail to load. Use caution with full urls; puzzle files have links (both raw and non-) that change every
+                                    time the puzzle is re-uploaded. To address files outside of the shared resources, a dollar sign $ as the first 
+                                    character preceding the relative path can be used to access a file from that puzzle's files. 
+                                    <br /><br />
+                                </div>
+                                <input asp-for="Puzzle.CustomCSSFile" class="form-control" />
+                                <span asp-validation-for="Puzzle.CustomCSSFile" class="text-danger"></span>
                             </div>
                         </td>
                         <td>

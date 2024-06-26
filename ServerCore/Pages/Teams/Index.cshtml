@@ -8,29 +8,6 @@
     ViewData["PlayRoute"] = "/Teams/Details";
 }
 
-<!-- TODO - figure out why site.min.css isn't working & remove this once it is -->
-<!-- Github issue https://github.com/PuzzleServer/mainpuzzleserver/issues/413 -->
-<style>
-    .shortcut-menu-dropdown {
-        position: relative;
-        display: inline-block;
-    }
-
-    .shortcut-menu-dropdown-content {
-        display: none;
-        position: absolute;
-        background-color: #f9f9f9;
-        min-width: 160px;
-        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-        padding: 12px 16px;
-        z-index: 1;
-    }
-
-    .shortcut-menu-dropdown:hover .shortcut-menu-dropdown-content {
-        display: block;
-    }
-</style>
-
 <h2>All Teams</h2>
 
 <p>
@@ -110,6 +87,9 @@
                 IsDisqualified
             </th>
             <th>
+                Automatic Team Type
+            </th>
+            <th>
                 Bio
             </th>
             <th>
@@ -162,6 +142,12 @@
                     }
                 </td>
                 <td>
+                    @if (item.AutoTeamType != null)
+                    {
+                        <text>@item.AutoTeamType</text>
+                    }
+                </td>
+                <td>
                     @item.Bio
                 </td>
                 <td>
@@ -180,6 +166,7 @@
                                 {
                                     <a asp-page="/Hints/AuthorIndex" asp-route-teamId="@item.ID">Hints Taken</a><br />
                                 }
+                                <a asp-page="/Threads/PuzzleThreads" asp-route-teamId="@item.ID">Threads</a><br />
                                 ------<br />
                                 <a asp-page="./MergeInto" asp-route-teamId="@item.ID">Merge Into...</a><br/>
                                 <a asp-page="./Delete" asp-route-teamId="@item.ID">Delete</a>
@@ -198,6 +185,7 @@
                                     <a asp-page="/Hints/AuthorIndex" asp-route-teamId="@item.ID">Hints Taken</a><br />
 
                                 }
+                                <a asp-page="/Threads/PuzzleThreads" asp-route-teamId="@item.ID">Threads</a><br />
                             </div>
                         </div>
                     }

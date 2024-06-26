@@ -5,6 +5,18 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ServerCore.DataModel
 {
+    [Flags]
+    public enum AutoTeamType
+    {
+        // Experience level
+        Beginner = 0x1,
+        Expert = 0x2,
+
+        // Commitment level
+        Casual = 0x4,
+        Serious = 0x8,
+    }
+
     public class Team
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -22,20 +34,37 @@ namespace ServerCore.DataModel
         public virtual Event Event { get; set; }
 
         [Required]
-        [RegularExpression("\\S+.*")]
+        [MaxLength(100)]
         public string Name { get; set; }
 
         /// <summary>
         /// String formatted rooms for events that don't pre-reserve rooms
         /// </summary>
+        [MaxLength(200)]
         public string CustomRoom { get; set; }
 
         public virtual List<Invitation> Invitations { get; set; }
 
+        [Required]
+        [MaxLength(500)] // Needs to be long enough to support adding every team member's email
         public string PrimaryContactEmail { get; set; }
+        [Phone]
+        [MaxLength(20)]
         public string PrimaryPhoneNumber { get; set; }
+        [Phone]
+        [MaxLength(20)]
         public string SecondaryPhoneNumber { get; set; }
+        
+        /// <summary>
+        /// True if a team should show up on the list of teams accepting applications
+        /// </summary>
         public bool IsLookingForTeammates { get; set; }
+
+        /// <summary>
+        /// True if applications to a team should be automatically approved without their intervention
+        /// </summary>
+        public bool AutoApproveTeammates { get; set; }
+
 
         public virtual List<Submission> Submissions { get; set; }
 
@@ -64,6 +93,7 @@ namespace ServerCore.DataModel
         /// <summary>
         /// Team bio for the signups page
         /// </summary>
+        [MaxLength(500)]
         public string Bio { get; set; }
 
         /// <summary>
@@ -92,5 +122,11 @@ namespace ServerCore.DataModel
         /// Show the team announcement for this team
         /// </summary>
         public bool ShowTeamAnnouncement { get; set; }
+
+        /// <summary>
+        /// If the team is automatically created, contains which type of players it's for.
+        /// Null if the team is manually created.
+        /// </summary>
+        public AutoTeamType? AutoTeamType { get; set; }
     }
 }

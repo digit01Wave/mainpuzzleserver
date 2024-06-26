@@ -10,9 +10,6 @@ using Microsoft.EntityFrameworkCore;
 using ServerCore.DataModel;
 using ServerCore.Helpers;
 using ServerCore.ModelBases;
-using Microsoft.Extensions.Options;
-using System.Drawing;
-using System.ComponentModel.DataAnnotations;
 
 namespace ServerCore.Pages.Teams
 {
@@ -53,7 +50,7 @@ namespace ServerCore.Pages.Teams
         public string TeamRoom { get; set; }
         public IList<TeamLunch> Lunches { get; set; }
         public string NewLunch { get; set; }
-        public static readonly string[] PizzaOptions = { "Cheese", "Pepperoni", "Philly Steak", "Salami", "Meatballs", "Grilled Chicken", "Canadian Bacon", "Beef", "Sausage", "Spicy Italian Sausage", "Bacon", "Pineapple", "Green Peppers", "Spinach", "Jalapeños", "Olives", "Mushrooms", "Artichoke Hearts", "Banana Peppers", "Tomatoes", "Garlic", "Onions" };
+        public static string[] LunchOptions { get; set; }
 
         private async Task<(bool passed, IActionResult redirect)> AuthChecks(int teamId)
         {
@@ -133,6 +130,7 @@ namespace ServerCore.Pages.Teams
                 int remoteMembers = await (from player in _context.PlayerInEvent
                                            join member in _context.TeamMembers on player.PlayerId equals member.Member.ID
                                            where member.Team.ID == Team.ID &&
+                                           player.EventId == Event.ID &&
                                            player.IsRemote
                                            select player).CountAsync();
                 EligibleForLunch = totalMembers - remoteMembers;
@@ -146,6 +144,15 @@ namespace ServerCore.Pages.Teams
 
                 double possibleInPersonMembers = Event.MaxTeamSize - remoteMembers;
                 SoftMaxLunches = (int)Math.Ceiling(possibleInPersonMembers / (double)PlayersPerLunch);
+            }
+            LunchOptions = (!string.IsNullOrWhiteSpace(Event.LunchOptions)) ? Event.LunchOptions.Split(";") : Array.Empty<string>();
+            for (int i = 0; i < LunchOptions.Length; i++) 
+            {
+                // Note that the lunch details are not displayed for team lunches
+                // These options are also used in Swag\Register.cshtml, Event\Details.cshtml, and Player\Create and Edit.cshtml
+                // If the way they're displayed ever changes, this needs to be made to match as well
+                LunchOptions[i] = LunchOptions[i].Split(":")[0];
+                LunchOptions[i] = LunchOptions[i].Trim().Trim('\"');
             }
 
             // Get team room
@@ -180,28 +187,49 @@ namespace ServerCore.Pages.Teams
             int teamCount = await (from count in _context.TeamMembers
                                    where count.Team.ID == teamId
                                    select count).CountAsync();
+            Team memberTeam = await (from team in _context.Teams where team.ID == teamId select team).FirstOrDefaultAsync();
+
             if (EventRole == EventRole.play)
             {
+                if (memberTeam.AutoTeamType.HasValue && member.Member != LoggedInUser)
+                {
+                    return NotFound("On a 'choose a team for me' team, you cannot remove other players. Ask them to remove themselves.");
+                }
+
                 if (teamCount == 1)
                 {
-                    return NotFound("Cannot remove the last member of a team. Delete the team instead.");
+                    if (!memberTeam.AutoTeamType.HasValue)
+                    {
+                        return NotFound("Cannot remove the last member of a team. Delete the team instead.");
+                    }
+                    else
+                    {
+                        // removing the last member of an auto team can remove the team
+                        await TeamHelper.DeleteTeamAsync(_context, memberTeam, false);
+                        memberTeam = null;
+                    }
                 }
             }
 
-            _context.TeamMembers.Remove(member);
-
-            // If the team fell below eligibility for a lunch, remove the most recent one
-            if (Event.EventHasTeamSwag && Event.CanChangeLunch && ((Event.PlayersPerLunch ?? 0) != 0))
+            if (memberTeam != null)
             {
-                int newLunchesAllowed = (int)Math.Ceiling((double)(teamCount - 1) / (double)Event.PlayersPerLunch.Value);
-                List<TeamLunch> curLunches = await (from lunch in _context.TeamLunch
-                                 where lunch.TeamId == teamId
-                                 orderby lunch.ID descending
-                                 select lunch).ToListAsync();
+                _context.TeamMembers.Remove(member);
 
-                if (newLunchesAllowed < curLunches.Count)
+                await TeamHelper.OnTeamMemberChange(_context, memberTeam);
+
+                // If the team fell below eligibility for a lunch, remove the most recent one
+                if (Event.EventHasTeamSwag && Event.CanChangeLunch && ((Event.PlayersPerLunch ?? 0) != 0))
                 {
-                    _context.TeamLunch.Remove(curLunches[0]);
+                    int newLunchesAllowed = (int)Math.Ceiling((double)(teamCount - 1) / (double)Event.PlayersPerLunch.Value);
+                    List<TeamLunch> curLunches = await (from lunch in _context.TeamLunch
+                                                        where lunch.TeamId == teamId
+                                                        orderby lunch.ID descending
+                                                        select lunch).ToListAsync();
+
+                    if (newLunchesAllowed < curLunches.Count)
+                    {
+                        _context.TeamLunch.Remove(curLunches[0]);
+                    }
                 }
             }
 
@@ -209,7 +237,7 @@ namespace ServerCore.Pages.Teams
 
             if (EventRole == EventRole.play && member.Member == LoggedInUser)
             {
-                return RedirectToPage("./List");
+                return RedirectToPage("./Signup");
             }
             return RedirectToPage("./Details", new { teamId = teamId });
         }

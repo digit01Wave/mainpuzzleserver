@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.CodeAnalysis.Elfie.Model.Strings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
@@ -144,6 +145,16 @@ namespace ServerCore
             CloudBlobDirectory puzzleDirectory = eventContainer.GetDirectoryReference(puzzleDirectoryName);
 
             return puzzleDirectory;
+        }
+
+        /// <summary>
+        /// Gets the url that that all file storage for this event lives at
+        /// </summary>
+        /// <returns>The url as a string</returns>
+        public static string GetFileStoragePrefix(int eventId, string puzzleDirectoryName) {
+            CloudBlobClient blobClient = StorageAccount.CreateCloudBlobClient();
+            CloudBlobContainer eventContainer = blobClient.GetContainerReference($"evt{eventId}");
+            return eventContainer.Uri.AbsoluteUri;
         }
 
         /// <summary>
